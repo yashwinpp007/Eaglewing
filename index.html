@@ -97,6 +97,19 @@
     <!-- ── HERO ── -->
     <section class="hero-home grid-bg" aria-label="Hero">
       <div class="glow-sphere" style="width:700px;height:700px;top:-200px;left:-200px;" aria-hidden="true"></div>
+      <div class="glow-sphere" style="width:500px;height:500px;top:40%;right:-150px;animation-delay:-3s;" aria-hidden="true"></div>
+      <div class="glow-sphere" style="width:300px;height:300px;bottom:-100px;left:30%;animation-delay:-5s;opacity:0.5;" aria-hidden="true"></div>
+
+      <!-- Orbit rings -->
+      <div class="orbit-rings" aria-hidden="true">
+        <div class="orbit-ring orbit-ring-1"></div>
+        <div class="orbit-ring orbit-ring-2"></div>
+        <div class="orbit-ring orbit-ring-3"></div>
+      </div>
+
+      <!-- Particles -->
+      <div class="hero-particles" id="hero-particles" aria-hidden="true"></div>
+
       <div class="container">
         <div class="hero-grid">
           <!-- Left -->
@@ -119,7 +132,8 @@
 
           <!-- Right — Dashboard -->
           <div class="hero-dashboard" aria-hidden="true">
-            <div class="glass-card dashboard-card">
+            <div class="glass-card dashboard-card" id="hero-dash-card">
+              <div class="dashboard-scan-line" aria-hidden="true"></div>
               <div class="dashboard-header">
                 <span class="dashboard-title">EAGLEWING COMMAND™</span>
                 <span class="dashboard-live"><span class="dot"></span>LIVE</span>

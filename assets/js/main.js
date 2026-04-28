@@ -194,6 +194,78 @@
     });
   });
 
+  /* ── Hero Particles ────────────────────────────────────── */
+  (function spawnParticles() {
+    const container = document.getElementById('hero-particles');
+    if (!container) return;
+    const count = 48;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('span');
+      p.className = 'hero-particle';
+      const size = 1.5 + Math.random() * 3;
+      p.style.cssText = [
+        'left:'              + (Math.random() * 100) + '%',
+        'top:'               + (Math.random() * 100) + '%',
+        'width:'             + size + 'px',
+        'height:'            + size + 'px',
+        'animation-duration:'  + (4 + Math.random() * 9) + 's',
+        'animation-delay:'     + (-Math.random() * 10) + 's',
+        'opacity:'             + (0.15 + Math.random() * 0.55)
+      ].join(';');
+      container.appendChild(p);
+    }
+  })();
+
+  /* ── Hero Mouse Parallax ────────────────────────────────── */
+  (function heroParallax() {
+    const hero   = document.querySelector('.hero-home');
+    if (!hero) return;
+    const left   = hero.querySelector('.hero-left');
+    const dash   = hero.querySelector('.hero-dashboard');
+    const rings  = hero.querySelectorAll('.orbit-ring');
+    const spheres = hero.querySelectorAll('.glow-sphere');
+    let raf = null;
+    let tx = 0, ty = 0;
+
+    hero.addEventListener('mousemove', (e) => {
+      const r  = hero.getBoundingClientRect();
+      const cx = (e.clientX - r.left)  / r.width  - 0.5;
+      const cy = (e.clientY - r.top)   / r.height - 0.5;
+      tx = cx; ty = cy;
+      if (!raf) raf = requestAnimationFrame(applyParallax);
+    });
+
+    hero.addEventListener('mouseleave', () => {
+      tx = 0; ty = 0;
+      if (!raf) raf = requestAnimationFrame(applyParallax);
+    });
+
+    function applyParallax() {
+      raf = null;
+      if (left)  left.style.transform  = `translate(${tx * 10}px, ${ty * 7}px)`;
+      if (dash)  dash.style.transform  = `translate(${tx * -16}px, ${ty * -10}px)`;
+      rings.forEach((ring, i) => {
+        const f = (i + 1) * (i % 2 === 0 ? 22 : -14);
+        ring.style.transform = `rotate(${ring.style.getPropertyValue('--base-rot') || '0deg'}) translate(${tx * f * 0.4}px, ${ty * f * 0.3}px)`;
+      });
+      spheres.forEach((s, i) => {
+        const f = i % 2 === 0 ? 28 : -18;
+        s.style.transform = `translate(${tx * f}px, ${ty * f * 0.7}px)`;
+      });
+    }
+  })();
+
+  /* ── Dashboard Bars Animate In ──────────────────────────── */
+  (function animateDashBars() {
+    const card = document.getElementById('hero-dash-card');
+    if (!card) return;
+    const bars = card.querySelectorAll('.dashboard-bar');
+    bars.forEach((bar, i) => {
+      bar.style.transformOrigin = 'bottom';
+      bar.style.animation = `dashBarLoad 0.7s cubic-bezier(0.34,1.56,0.64,1) ${0.6 + i * 0.1}s both`;
+    });
+  })();
+
   /* ── Counter Animation ─────────────────────────────────── */
   function animateCounter(el) {
     const target = el.dataset.target;
