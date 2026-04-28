@@ -1,0 +1,229 @@
+/* ============================================================
+   EAGLEWING FACILITY SERVICES — MAIN JAVASCRIPT
+   main.js — All interactive behaviour
+   ============================================================ */
+
+(function () {
+  'use strict';
+
+  /* ── Mobile Nav Toggle ─────────────────────────────────── */
+  const hamburger = document.querySelector('.nav-hamburger');
+  const overlay   = document.querySelector('.nav-overlay');
+
+  if (hamburger && overlay) {
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.classList.toggle('open');
+      overlay.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+    overlay.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  /* ── Sticky Header Shrink ──────────────────────────────── */
+  const siteNav = document.querySelector('.site-nav');
+  if (siteNav) {
+    const onScroll = () => {
+      siteNav.classList.toggle('scrolled', window.scrollY > 80);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  /* ── Active Nav Link ───────────────────────────────────── */
+  (function setActiveNav() {
+    const path = window.location.pathname;
+    const filename = path.split('/').filter(Boolean).pop() || 'index.html';
+    document.querySelectorAll('.nav-pill a, .nav-overlay a').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      const hFile = href.split('/').filter(Boolean).pop() || 'index.html';
+      if (hFile === filename) a.classList.add('active');
+    });
+  })();
+
+  /* ── Hero Slide Cycle ──────────────────────────────────── */
+  const slides = [
+    {
+      line1: 'INTELLIGENT CLEANING.',
+      line2: 'MEASURABLE RESULTS.',
+      body: 'We use smart systems, real data, and advanced cleaning methods to deliver facilities that perform.',
+      cta1: { text: 'GET A QUOTE →', href: null },
+      cta2: { text: '📅 BOOK A SITE AUDIT', href: null }
+    },
+    {
+      line1: 'YOUR FACILITY DESERVES',
+      line2: 'BETTER THAN CLEAN.',
+      body: 'EagleWing delivers precision-maintained environments that reflect your brand and protect your people.',
+      cta1: { text: 'SEE OUR SERVICES →', href: 'services/index.html' },
+      cta2: { text: 'GET A QUOTE', href: 'get-a-quote.html' }
+    },
+    {
+      line1: 'PEOPLE YOU CAN',
+      line2: 'TRUST. EVERY TIME.',
+      body: 'Every team member is background-checked, formally trained, and verified — before they set foot in your facility.',
+      cta1: { text: 'MEET OUR PROCESS →', href: 'process.html' },
+      cta2: { text: '📅 BOOK A SITE AUDIT', href: null }
+    },
+    {
+      line1: 'MEDICAL-GRADE CLEAN.',
+      line2: 'ZERO COMPROMISE.',
+      body: 'Infection control protocols meeting the highest hygiene standards — for healthcare, clinics, and allied health.',
+      cta1: { text: 'INFECTION CONTROL →', href: 'services/medical-cleaning.html' },
+      cta2: { text: 'GET A QUOTE', href: 'get-a-quote.html' }
+    },
+    {
+      line1: "SERVING AUSTRALIA'S",
+      line2: 'LEADING BUSINESSES.',
+      body: 'From corporate towers to medical centres — Melbourne and Sydney facilities trust EagleWing every day.',
+      cta1: { text: 'WHERE WE CLEAN →', href: 'locations/index.html' },
+      cta2: { text: 'GET A QUOTE', href: 'get-a-quote.html' }
+    }
+  ];
+
+  const line1El   = document.querySelector('.hero-headline .line-1');
+  const line2El   = document.querySelector('.hero-headline .line-2');
+  const bodyEl    = document.querySelector('.hero-body');
+  const cta1El    = document.querySelector('.hero-cta-1');
+  const cta2El    = document.querySelector('.hero-cta-2');
+  const indicators = document.querySelectorAll('.hero-indicator');
+
+  if (line1El && line2El && bodyEl) {
+    let current = 0;
+    let timer = null;
+    let paused = false;
+
+    function goToSlide(idx) {
+      current = idx;
+      const s = slides[idx];
+      line1El.textContent = s.line1;
+      line2El.textContent = s.line2;
+      bodyEl.textContent  = s.body;
+      if (cta1El) {
+        cta1El.textContent = s.cta1.text;
+        if (s.cta1.href) cta1El.setAttribute('href', s.cta1.href);
+        else cta1El.setAttribute('href', 'get-a-quote.html');
+      }
+      if (cta2El) {
+        cta2El.textContent = s.cta2.text;
+        if (s.cta2.href) cta2El.setAttribute('href', s.cta2.href);
+        else cta2El.setAttribute('href', 'get-a-quote.html');
+      }
+      indicators.forEach((bar, i) => bar.classList.toggle('active', i === idx));
+    }
+
+    function next() {
+      goToSlide((current + 1) % slides.length);
+    }
+
+    function startTimer() {
+      timer = setInterval(next, 5000);
+    }
+
+    indicators.forEach((bar, i) => {
+      bar.addEventListener('click', () => {
+        clearInterval(timer);
+        goToSlide(i);
+        startTimer();
+      });
+    });
+
+    const heroSection = document.querySelector('.hero-home');
+    if (heroSection) {
+      heroSection.addEventListener('mouseenter', () => { clearInterval(timer); });
+      heroSection.addEventListener('mouseleave', () => { startTimer(); });
+    }
+
+    goToSlide(0);
+    startTimer();
+  }
+
+  /* ── Scroll Reveal (IntersectionObserver) ──────────────── */
+  const revealEls = document.querySelectorAll('.reveal');
+  if (revealEls.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+  }
+
+  /* Stagger delay for grid children */
+  document.querySelectorAll('.services-grid, .testimonials-grid, .bento-grid, .values-grid, .services-hub-grid, .blog-grid').forEach(grid => {
+    const children = grid.querySelectorAll('.reveal');
+    children.forEach((child, i) => {
+      child.style.transitionDelay = (i * 0.08) + 's';
+    });
+  });
+
+  /* ── FAQ Accordion ─────────────────────────────────────── */
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-question');
+    if (!q) return;
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── Blog Category Filter ──────────────────────────────── */
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const blogCards  = document.querySelectorAll('.blog-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.category;
+      blogCards.forEach(card => {
+        if (cat === 'all' || card.dataset.category === cat) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  /* ── Counter Animation ─────────────────────────────────── */
+  function animateCounter(el) {
+    const target = el.dataset.target;
+    const suffix = target.replace(/[0-9]/g, '');
+    const num    = parseInt(target, 10);
+    const duration = 1600;
+    const start  = performance.now();
+
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * num) + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  const counters = document.querySelectorAll('.counter');
+  if (counters.length > 0) {
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(c => counterObserver.observe(c));
+  }
+
+})();
