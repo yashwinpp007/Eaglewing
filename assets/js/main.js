@@ -90,7 +90,7 @@
   const cta1El     = document.querySelector('.hero-cta-1');
   const cta2El     = document.querySelector('.hero-cta-2');
   const indicators = document.querySelectorAll('.hero-indicator');
-  const heroLeft   = document.querySelector('.hero-left');
+  const heroLeft   = document.querySelector('.hero-slide-content');
   const prevBtn    = document.getElementById('hero-prev');
   const nextBtn    = document.getElementById('hero-next');
 

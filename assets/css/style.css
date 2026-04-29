@@ -1016,7 +1016,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── HERO — HOMEPAGE ──────────────────────────────────────── */
 .hero-home {
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 600px;
   display: flex;
   align-items: center;
   background: var(--base);
@@ -1232,11 +1233,19 @@ h1, h2, h3, h4, h5, h6 {
 .hero-arrow-prev { left: clamp(0.75rem, 2vw, 2rem); }
 .hero-arrow-next { right: clamp(0.75rem, 2vw, 2rem); }
 
-/* Hero slide transition classes */
-.hero-left.slide-exit-left  { animation: slideOutToLeft  0.3s ease-in both; }
-.hero-left.slide-exit-right { animation: slideOutToRight 0.3s ease-in both; }
-.hero-left.slide-enter-right { animation: slideInFromRight 0.4s cubic-bezier(0.16,1,0.3,1) both; }
-.hero-left.slide-enter-left  { animation: slideInFromLeft  0.4s cubic-bezier(0.16,1,0.3,1) both; }
+/* Hero left clips the slide animation so text never bleeds into dashboard */
+.hero-left {
+  overflow: hidden;
+}
+.hero-slide-content {
+  width: 100%;
+}
+
+/* Slide animation on the inner content wrapper, clipped by hero-left */
+.hero-slide-content.slide-exit-left   { animation: slideOutToLeft   0.28s ease-in  both; }
+.hero-slide-content.slide-exit-right  { animation: slideOutToRight  0.28s ease-in  both; }
+.hero-slide-content.slide-enter-right { animation: slideInFromRight 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+.hero-slide-content.slide-enter-left  { animation: slideInFromLeft  0.4s cubic-bezier(0.16,1,0.3,1) both; }
 
 @media (max-width: 768px) {
   .hero-arrow { width: 40px; height: 40px; }
