@@ -84,60 +84,88 @@
     }
   ];
 
-  const line1El   = document.querySelector('.hero-headline .line-1');
-  const line2El   = document.querySelector('.hero-headline .line-2');
-  const bodyEl    = document.querySelector('.hero-body');
-  const cta1El    = document.querySelector('.hero-cta-1');
-  const cta2El    = document.querySelector('.hero-cta-2');
+  const line1El    = document.querySelector('.hero-headline .line-1');
+  const line2El    = document.querySelector('.hero-headline .line-2');
+  const bodyEl     = document.querySelector('.hero-body');
+  const cta1El     = document.querySelector('.hero-cta-1');
+  const cta2El     = document.querySelector('.hero-cta-2');
   const indicators = document.querySelectorAll('.hero-indicator');
+  const heroLeft   = document.querySelector('.hero-left');
+  const prevBtn    = document.getElementById('hero-prev');
+  const nextBtn    = document.getElementById('hero-next');
 
   if (line1El && line2El && bodyEl) {
-    let current = 0;
-    let timer = null;
-    let paused = false;
+    let current   = 0;
+    let timer     = null;
+    let animating = false;
 
-    function goToSlide(idx) {
-      current = idx;
+    function applyContent(idx) {
       const s = slides[idx];
       line1El.textContent = s.line1;
       line2El.textContent = s.line2;
       bodyEl.textContent  = s.body;
       if (cta1El) {
         cta1El.textContent = s.cta1.text;
-        if (s.cta1.href) cta1El.setAttribute('href', s.cta1.href);
-        else cta1El.setAttribute('href', 'get-a-quote.html');
+        cta1El.setAttribute('href', s.cta1.href || 'get-a-quote.html');
       }
       if (cta2El) {
         cta2El.textContent = s.cta2.text;
-        if (s.cta2.href) cta2El.setAttribute('href', s.cta2.href);
-        else cta2El.setAttribute('href', 'get-a-quote.html');
+        cta2El.setAttribute('href', s.cta2.href || 'get-a-quote.html');
       }
       indicators.forEach((bar, i) => bar.classList.toggle('active', i === idx));
     }
 
-    function next() {
-      goToSlide((current + 1) % slides.length);
+    function goToSlide(idx, direction) {
+      if (animating) return;
+      animating = true;
+      const exitClass  = direction === 'next' ? 'slide-exit-left'   : 'slide-exit-right';
+      const enterClass = direction === 'next' ? 'slide-enter-right'  : 'slide-enter-left';
+
+      if (heroLeft) {
+        heroLeft.classList.add(exitClass);
+        setTimeout(() => {
+          heroLeft.classList.remove(exitClass);
+          current = idx;
+          applyContent(current);
+          heroLeft.classList.add(enterClass);
+          heroLeft.addEventListener('animationend', function cleanup() {
+            heroLeft.classList.remove(enterClass);
+            heroLeft.removeEventListener('animationend', cleanup);
+            animating = false;
+          });
+        }, 280);
+      } else {
+        current = idx;
+        applyContent(current);
+        animating = false;
+      }
     }
 
-    function startTimer() {
-      timer = setInterval(next, 5000);
-    }
+    function next() { goToSlide((current + 1) % slides.length, 'next'); }
+    function prev() { goToSlide((current - 1 + slides.length) % slides.length, 'prev'); }
+
+    function startTimer() { timer = setInterval(next, 5000); }
+    function stopTimer()  { clearInterval(timer); }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => { stopTimer(); prev(); startTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { stopTimer(); next(); startTimer(); });
 
     indicators.forEach((bar, i) => {
       bar.addEventListener('click', () => {
-        clearInterval(timer);
-        goToSlide(i);
+        if (i === current) return;
+        stopTimer();
+        goToSlide(i, i > current ? 'next' : 'prev');
         startTimer();
       });
     });
 
     const heroSection = document.querySelector('.hero-home');
     if (heroSection) {
-      heroSection.addEventListener('mouseenter', () => { clearInterval(timer); });
-      heroSection.addEventListener('mouseleave', () => { startTimer(); });
+      heroSection.addEventListener('mouseenter', stopTimer);
+      heroSection.addEventListener('mouseleave', startTimer);
     }
 
-    goToSlide(0);
+    applyContent(0);
     startTimer();
   }
 
