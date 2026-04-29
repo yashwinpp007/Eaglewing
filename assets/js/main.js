@@ -144,7 +144,7 @@
     function next() { goToSlide((current + 1) % slides.length, 'next'); }
     function prev() { goToSlide((current - 1 + slides.length) % slides.length, 'prev'); }
 
-    function startTimer() { timer = setInterval(next, 5000); }
+    function startTimer() { timer = setInterval(next, 8000); }
     function stopTimer()  { clearInterval(timer); }
 
     if (prevBtn) prevBtn.addEventListener('click', () => { stopTimer(); prev(); startTimer(); });
